@@ -61,6 +61,7 @@
       let lastConsoleAt = 0;
       const diagnostics = {
         events,
+        renders: [],
         lastRender: null,
         record(type, detail) {
           const entry = Object.assign({ type, at: new Date().toISOString() }, detail || {});
@@ -75,12 +76,14 @@
           return entry;
         },
         render(sample) {
+          this.renders.push(sample);
+          if (this.renders.length > 100) this.renders.shift();
           const previous = this.lastRender;
-          if (sample.durationMs >= 40) this.record('slow-render', sample);
+          if (sample.durationMs >= 16.7) this.record('slow-render', sample);
           if (previous) {
             const gapMs = sample.startedMs - previous.startedMs;
             const combinedMs = previous.durationMs + sample.durationMs;
-            if (gapMs < 50 && combinedMs >= 40) {
+            if (gapMs < 50 && combinedMs >= 24) {
               this.record('render-burst', Object.assign({
                 gapMs: Math.round(gapMs * 10) / 10,
                 combinedMs: Math.round(combinedMs * 10) / 10,
@@ -100,13 +103,24 @@
               zoom: window.Model && Model.project ? Model.project.settings.zoom : null,
             },
             recentEvents: events.slice(),
+            recentRenders: this.renders.slice(-50),
           };
           console.table(report.recentEvents);
+          console.table(report.recentRenders);
           return report;
         },
-        clear() { events.length = 0; this.lastRender = null; },
+        clear() { events.length = 0; this.renders.length = 0; this.lastRender = null; },
       };
       window.GanttDiagnostics = diagnostics;
+
+      window.addEventListener('error', event => diagnostics.record('runtime-error', {
+        message: String(event.message || 'Unknown error').slice(0, 300),
+        file: event.filename ? event.filename.split('/').pop() : null,
+        line: event.lineno || null,
+      }));
+      window.addEventListener('unhandledrejection', event => diagnostics.record('unhandled-rejection', {
+        message: String(event.reason && (event.reason.message || event.reason) || 'Unknown rejection').slice(0, 300),
+      }));
 
       if (window.PerformanceObserver) {
         try {

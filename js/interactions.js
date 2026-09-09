@@ -138,8 +138,11 @@
         mode, task, barEl, startX: e.clientX, startY: e.clientY,
         origStart: task.start, origEnd: task.end, origProgress: task.progress || 0,
         dayW, moved: false, snapshotTaken: false,
-        coarse: e.pointerType === 'touch',
+        coarse: e.pointerType === 'touch', startedMs: performance.now(), moveEvents: 0,
       };
+      if (window.GanttDiagnostics) GanttDiagnostics.record('drag-start', {
+        mode, pointerType: e.pointerType || 'mouse', tasks: Model.tasks().length,
+      });
 
       if (mode === 'dep') {
         drag.depFromSide = fromSide;
@@ -189,6 +192,7 @@
   function onMove(e) {
     if (!drag) return;
     if (e.pointerId != null && drag.pointerId != null && e.pointerId !== drag.pointerId) return;
+    drag.moveEvents++;
     const dx = e.clientX - drag.startX;
     /* A finger never holds still. 2px was fine for a mouse and turns
        every tap on a touchscreen into a drag, so a plain tap would
@@ -320,6 +324,13 @@
       Model.save();
       Model.emit('change', Model.project);
     }
+    if (window.GanttDiagnostics) GanttDiagnostics.record('drag-end', {
+      mode: drag.mode,
+      event: e.type,
+      moved: drag.moved,
+      moveEvents: drag.moveEvents,
+      durationMs: Math.round((performance.now() - drag.startedMs) * 10) / 10,
+    });
     drag = null;
   }
 

@@ -9,38 +9,38 @@
   },
   "css/styles.css": {
     "hash": "26a8d675c3f3",
-    "version": "77"
+    "version": "78"
   },
   "js/app.js": {
-    "hash": "b3902db41a61",
-    "version": "77"
+    "hash": "db8fe802b029",
+    "version": "78"
   },
   "js/render.js": {
     "hash": "d8ebdae634c8",
-    "version": "77"
+    "version": "78"
   },
   "js/model.js": {
     "hash": "c5762620db62",
-    "version": "77"
+    "version": "78"
   },
   "js/interactions.js": {
-    "hash": "deeefeb145ac",
-    "version": "77"
+    "hash": "7cf0c6f07ecc",
+    "version": "78"
   },
   "js/exports.js": {
     "hash": "72360c29a2ee",
-    "version": "77"
+    "version": "78"
   },
   "js/features.js": {
     "hash": "9dd1dea51030",
-    "version": "77"
+    "version": "78"
   },
   "js/templates.js": {
     "hash": "d6ab4ea27d68",
-    "version": "77"
+    "version": "78"
   },
   "js/schedule.js": {
     "hash": "68d7f1df0959",
-    "version": "77"
+    "version": "78"
   }
 }
