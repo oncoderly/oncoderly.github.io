@@ -176,6 +176,9 @@ body.col-resizing .grow-row:hover { background: none; }
   min-width: 0; height: 34px; line-height: 14px; resize: none;
   white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto;
 }
+.grow-row.is-group .cell-name-input {
+  font-size: 14px; font-weight: 700; line-height: 15px; padding-top: 1px; padding-bottom: 1px;
+}
 :root[data-theme="dark"] .cell-input:focus { background: var(--bg-softer); }
 .col-start .cell-input, .col-end .cell-input { font-size: 11.5px; }
 /* hide native number spinners (they crowd the narrow Days/% columns) */
@@ -279,6 +282,7 @@ body.col-resizing .grow-row:hover { background: none; }
 .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px 0 0 6px; background: rgba(0,0,0,.22); pointer-events: none; }
 .bar-label { position: absolute; left: calc(100% + 8px); white-space: nowrap; font-size: 11.5px; color: var(--ink); pointer-events: none; }
 .bar-label.inside { left: 8px; color: #fff; font-weight: 600; }
+.bar.group .bar-label { font-size: 14px; font-weight: 700; }
 .bar-handle { position: absolute; top: 0; bottom: 0; width: 8px; cursor: ew-resize; }
 .bar-handle.l { left: -2px; } .bar-handle.r { right: -2px; }
 .bar-progress-handle { position: absolute; top: 50%; width: 12px; height: 12px; transform: translate(-50%,-50%); background: #fff; border: 2px solid rgba(0,0,0,.35); border-radius: 50%; cursor: ew-resize; z-index: 3; opacity: 0; transition: opacity .1s; }
