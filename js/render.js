@@ -284,8 +284,8 @@
         this.sizeCell(cell, c);
         row.appendChild(cell);
       });
-      row.addEventListener('click', (e) => { if (e.target.tagName === 'INPUT') return; Model.select(t.id); });
-      row.addEventListener('dblclick', (e) => { if (e.target.tagName === 'INPUT') return; Model.select(t.id); App.openDrawer(t.id, 'row'); });
+      row.addEventListener('click', (e) => { if (e.target.matches('input, textarea')) return; Model.select(t.id); });
+      row.addEventListener('dblclick', (e) => { if (e.target.matches('input, textarea')) return; Model.select(t.id); App.openDrawer(t.id, 'row'); });
       Interactions.wireRowDrag(row, t.id);
       return row;
     },
@@ -300,22 +300,18 @@
         onclick: (e) => { e.stopPropagation(); if (hasKids) Model.toggleCollapse(t.id); },
       });
       const dot = U.el('span', { class: 'dot', style: { background: t.type === 'group' ? '#475569' : t.color } });
-      const input = U.el('input', {
-        class: 'cell-input', value: t.name, spellcheck: 'false',
+      const input = U.el('textarea', {
+        class: 'cell-input cell-name-input', spellcheck: 'false', rows: '2', wrap: 'soft',
         /* The name field is the one cell whose value IS its meaning, so
            it only needs the column, not the row context. */
         'aria-label': App.T('col.name', 'Task name'),
-        /* A long name is clipped with an ellipsis (the grid and chart
-           share a fixed row height, so it cannot wrap without desyncing
-           the bar beside it). The title makes the full text recoverable
-           on hover, and the Name column can be dragged wider from its
-           header, so nothing is ever lost, only tucked away. Refreshed
-           on edit so the tooltip never lags the value. */
+        // Wrap within the shared grid/chart row height; longer names scroll.
         title: t.name || '',
         style: { paddingLeft: (depth * 14) + 'px', flex: '1' },
         onchange: (e) => { e.target.title = e.target.value; Model.update(t.id, { name: e.target.value }); },
-        onkeydown: (e) => { if (e.key === 'Enter') e.target.blur(); },
+        onkeydown: (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); e.target.blur(); } },
       });
+      input.value = t.name || '';
       return U.el('div', { class: 'grow-cell col-name' }, [twisty, dot, input]);
     },
     /* Every grid input needs an accessible name, and the name has to say
