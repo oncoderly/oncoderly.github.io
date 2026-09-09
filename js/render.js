@@ -60,7 +60,8 @@
       return { origin, endDate, totalDays, dayW, zoom, width: Math.ceil(totalDays * dayW) };
     },
 
-    render() {
+    render(reason) {
+      const started = performance.now();
       const tasks = Model.tasks();
       this.els.emptyState.hidden = tasks.length > 0;
 
@@ -78,6 +79,20 @@
       this.renderGrid(visible);
       this.renderChartHead();
       this.renderChartBody(visible);
+
+      if (window.GanttDiagnostics && GanttDiagnostics.render) {
+        const duration = performance.now() - started;
+        GanttDiagnostics.render({
+          durationMs: Math.round(duration * 10) / 10,
+          startedMs: Math.round(started * 10) / 10,
+          reason: reason || 'direct',
+          tasks: tasks.length,
+          visibleTasks: visible.length,
+          dependencies: tasks.reduce((n, t) => n + (t.deps || []).length, 0),
+          timelineDays: rs.totalDays,
+          zoom: rs.zoom,
+        });
+      }
     },
 
     /* The one place a view filter is applied. Both panes and the row
@@ -828,7 +843,7 @@
         const labelText = t.name + (t.assignee ? '  ·  ' + t.assignee : '');
         const lbl = U.el('div', { class: 'bar-label' }, [
           U.el('span', { class: 'bar-label-in', style: { color: U.contrast(this._barColor(t)) } }, labelText),
-          U.el('span', { class: 'bar-label-out' }, labelText),
+          U.el('span', { class: 'bar-label-out', 'aria-hidden': 'true' }, labelText),
         ]);
         lbl.style.setProperty('--label-inside', Math.max(0, w - 4) + 'px');
         b.appendChild(lbl);
@@ -846,7 +861,7 @@
       } else {
         const lbl = U.el('div', { class: 'bar-label' }, [
           U.el('span', { class: 'bar-label-in', style: { color: '#fff' } }, t.name),
-          U.el('span', { class: 'bar-label-out' }, t.name),
+          U.el('span', { class: 'bar-label-out', 'aria-hidden': 'true' }, t.name),
         ]);
         lbl.style.setProperty('--label-inside', Math.max(0, w - 4) + 'px');
         b.appendChild(lbl);

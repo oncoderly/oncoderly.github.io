@@ -8,6 +8,7 @@
 
   const App = {
     init() {
+      this.initDiagnostics();
       Render.init();
       Model.init();
 
@@ -54,6 +55,74 @@
       if (window.Features) Features.init();
     },
 
+    initDiagnostics() {
+      if (window.GanttDiagnostics) return;
+      const events = [];
+      let lastConsoleAt = 0;
+      const diagnostics = {
+        events,
+        lastRender: null,
+        record(type, detail) {
+          const entry = Object.assign({ type, at: new Date().toISOString() }, detail || {});
+          events.push(entry);
+          if (events.length > 200) events.shift();
+          const noisy = type === 'slow-render' || type === 'render-burst' || type === 'long-task';
+          const now = performance.now();
+          if (noisy && now - lastConsoleAt > 750) {
+            lastConsoleAt = now;
+            console.warn('[Gantt performance]', entry);
+          }
+          return entry;
+        },
+        render(sample) {
+          const previous = this.lastRender;
+          if (sample.durationMs >= 40) this.record('slow-render', sample);
+          if (previous) {
+            const gapMs = sample.startedMs - previous.startedMs;
+            const combinedMs = previous.durationMs + sample.durationMs;
+            if (gapMs < 50 && combinedMs >= 40) {
+              this.record('render-burst', Object.assign({
+                gapMs: Math.round(gapMs * 10) / 10,
+                combinedMs: Math.round(combinedMs * 10) / 10,
+                previousReason: previous.reason,
+              }, sample));
+            }
+          }
+          this.lastRender = sample;
+        },
+        report() {
+          const tasks = window.Model && Model.project ? Model.tasks() : [];
+          const report = {
+            generatedAt: new Date().toISOString(),
+            project: {
+              tasks: tasks.length,
+              dependencies: tasks.reduce((n, t) => n + (t.deps || []).length, 0),
+              zoom: window.Model && Model.project ? Model.project.settings.zoom : null,
+            },
+            recentEvents: events.slice(),
+          };
+          console.table(report.recentEvents);
+          return report;
+        },
+        clear() { events.length = 0; this.lastRender = null; },
+      };
+      window.GanttDiagnostics = diagnostics;
+
+      if (window.PerformanceObserver) {
+        try {
+          const observer = new PerformanceObserver(list => {
+            list.getEntries().forEach(entry => diagnostics.record('long-task', {
+              durationMs: Math.round(entry.duration * 10) / 10,
+              startedMs: Math.round(entry.startTime * 10) / 10,
+            }));
+          });
+          observer.observe({ type: 'longtask', buffered: true });
+          diagnostics.longTaskObserver = observer;
+        } catch (e) { /* Long Tasks API is optional. */ }
+      }
+      console.info('[Gantt performance] Diagnostics active. Run GanttDiagnostics.report() after a freeze.');
+    },
+
     /* Translate a chrome string. Falls back to the key's English text
        so a missing translation degrades to English rather than showing
        a raw key like "drawer.assignee" to the user. */
@@ -76,7 +145,7 @@
     },
 
     render() {
-      Render.render();
+      Render.render('app');
       this.applyGridWidth();
       this.applyFont();
       this.renderWorkload();

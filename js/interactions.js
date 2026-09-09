@@ -211,7 +211,7 @@
       let pct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
       pct = Math.max(0, Math.min(100, pct));
       Model.liveUpdate(task.id, { progress: pct });
-      Render.render();
+      Render.render('drag-progress-extra');
       return;
     }
 
@@ -241,7 +241,7 @@
       if (U.parse(newEnd) < U.parse(drag.origStart)) newEnd = drag.origStart;
       Model.liveUpdate(task.id, { end: newEnd });
     }
-    Render.render();
+    Render.render('drag-extra');
   }
 
   function moveGroupBlock(group, dd) {
@@ -312,7 +312,7 @@
           if (!ok) App.toast('Could not add dependency (would create a loop)');
         }
       }
-      Render.render();
+      Render.render('dependency-drop-extra');
     } else if (!drag.moved) {
       // pure click on a bar (no drag): open the task card next to it
       App.openDrawer(drag.task.id, 'bar');
