@@ -823,8 +823,7 @@
         if (Model.project.settings.showProgress && t.progress > 0) {
           b.appendChild(U.el('div', { class: 'bar-fill', style: { width: (t.progress) + '%' } }));
         }
-        // Anchor names at the task start. The text outline keeps long
-        // names readable both over the bar and beyond its finish.
+        // Anchor names at the task start.
         const lbl = U.el('div', { class: 'bar-label' },
           t.name + (t.assignee ? '  ·  ' + t.assignee : ''));
         b.appendChild(lbl);
