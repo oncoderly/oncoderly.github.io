@@ -15,6 +15,8 @@
   --line-strong: #d4cfe4;
   --brand: #6c4cf1;
   --brand-soft: #ece8ff;
+  --selected-row-bg: #d9d0ff;
+  --selected-row-edge: #6945d8;
   --danger: #dc2626;
   --weekend: #f6f5fb;
   --today: #ef4444;
@@ -157,7 +159,13 @@ body.col-resizing .grow-row:hover { background: none; }
 
 .grow-row { display: flex; align-items: center; height: var(--row-h); border-bottom: 1px solid var(--line); cursor: pointer; width: 100%; }
 .grow-row:hover { background: #f8fafc; }
-.grow-row.selected { background: var(--brand-soft); }
+.grow-row.selected {
+  background: var(--selected-row-bg);
+  box-shadow: inset 4px 0 0 var(--selected-row-edge),
+    inset 0 1px 0 var(--selected-row-edge), inset 0 -1px 0 var(--selected-row-edge);
+}
+.grow-row.selected .col-id .ro-text,
+.grow-row.selected .col-wbs2 .ro-text { color: var(--ink); }
 .grow-row.dragover { box-shadow: inset 0 -2px 0 var(--brand); }
 .grow-cell { padding: 0 8px; display: flex; align-items: center; height: 100%; border-right: 1px solid var(--line-soft, transparent); font-size: 12px; overflow: hidden; flex: none; }
 .grow-cell.col-name { gap: 4px; }
@@ -455,6 +463,8 @@ body.card-dragging .drawer { animation: none; }
   --line-strong: #3d3560;
   --brand: #8b5cf6;
   --brand-soft: #241d40;
+  --selected-row-bg: #34306a;
+  --selected-row-edge: #b4a0ff;
   --weekend: #130f24;
   --today: #f87171;
   --critical: #fb923c;
@@ -466,6 +476,8 @@ body.card-dragging .drawer { animation: none; }
 :root[data-theme="dark"] .chart-head { background: #0e1729; }
 :root[data-theme="dark"] .gh-cell { color: var(--ink-soft); }
 :root[data-theme="dark"] .grow-row:hover { background: #0e1729; }
+.grow-row.selected:hover,
+:root[data-theme="dark"] .grow-row.selected:hover { background: var(--selected-row-bg); }
 :root[data-theme="dark"] .head-tier.weekend { background: #0c1424; }
 :root[data-theme="dark"] .head-tier { color: var(--ink); }
 :root[data-theme="dark"] .head-tier.lower { color: var(--ink-soft); }

@@ -8,39 +8,39 @@
     "version": "31"
   },
   "css/styles.css": {
-    "hash": "69ce639ad007",
-    "version": "67"
+    "hash": "4168e44fd6e3",
+    "version": "68"
   },
   "js/app.js": {
     "hash": "3bc33cea7831",
-    "version": "67"
+    "version": "68"
   },
   "js/render.js": {
     "hash": "e2e745626fea",
-    "version": "67"
+    "version": "68"
   },
   "js/model.js": {
     "hash": "c5762620db62",
-    "version": "67"
+    "version": "68"
   },
   "js/interactions.js": {
     "hash": "3eac5a2dc7bc",
-    "version": "67"
+    "version": "68"
   },
   "js/exports.js": {
     "hash": "72360c29a2ee",
-    "version": "67"
+    "version": "68"
   },
   "js/features.js": {
     "hash": "9dd1dea51030",
-    "version": "67"
+    "version": "68"
   },
   "js/templates.js": {
     "hash": "d6ab4ea27d68",
-    "version": "67"
+    "version": "68"
   },
   "js/schedule.js": {
     "hash": "68d7f1df0959",
-    "version": "67"
+    "version": "68"
   }
 }
