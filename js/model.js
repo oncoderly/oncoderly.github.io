@@ -590,10 +590,10 @@
        not an error: mail clients and chat apps truncate it, and the
        recipient opens a link that quietly does nothing. */
 
-    /** Roughly the longest URL that survives being pasted around.
-        Browsers cope with far more, but Outlook, Slack unfurls and
-        older proxies do not, and a truncated link fails silently. */
-    SHARE_LIMIT: 8000,
+    /** Keep copied links below Outlook's legacy 2,084-character boundary.
+        Safe Links can make the final URL longer, so leave room for its
+        wrapper and direct larger plans to the lossless project file. */
+    SHARE_LIMIT: 1900,
 
     _sharePayload() {
       const st = Object.assign({}, this.project.settings);

@@ -439,8 +439,8 @@
       if (r.tooLong) {
         App.openModal(App.T('ex.tooBigTitle', 'This plan is too big for a link'), (body) => {
           body.appendChild(U.el('p', {},
-            `The link would be ${r.length.toLocaleString()} characters. Mail clients, chat apps and `
-            + `some proxies truncate long URLs, so the person you send it to would open an empty editor.`));
+            `The link would be ${r.length.toLocaleString()} characters. Outlook Safe Links, other mail clients, `
+            + `chat apps and some proxies can truncate long URLs, so the recipient may open an empty editor.`));
           body.appendChild(U.el('p', { class: 'muted' },
             'Send them the project file instead, it opens with the Open button and has no size limit.'));
           const row = U.el('div', { class: 'modal-actions' });
