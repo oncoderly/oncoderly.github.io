@@ -866,12 +866,41 @@
            end. A transform has no maximum and stays pixel-exact. */
         if (wlTrack) wlTrack.style.transform = 'translateX(' + (-chartScroll.scrollLeft) + 'px)';
       });
-      // horizontal scroll of the grid columns keeps the grid header in sync
-      gridBody.addEventListener('scroll', () => { gridHead.scrollLeft = gridBody.scrollLeft; });
+      // Allow the list's scrollbar and touch gestures to move both panes.
+      gridBody.addEventListener('scroll', () => {
+        gridHead.scrollLeft = gridBody.scrollLeft;
+        if (Math.abs(chartScroll.scrollTop - gridBody.scrollTop) > 1) {
+          chartScroll.scrollTop = gridBody.scrollTop;
+        }
+      });
+      // Different horizontal scrollbar heights must not shorten either pane's
+      // vertical range, otherwise the last rows slip out of alignment.
+      const syncScrollSpace = () => {
+        const canvas = U.$('#chartCanvas');
+        gridHead.style.paddingRight = (gridBody.offsetWidth - gridBody.clientWidth) + 'px';
+        gridBody.style.paddingBottom = Math.max(0,
+          gridBody.clientHeight - chartScroll.clientHeight + canvas.scrollHeight - canvas.clientHeight) + 'px';
+      };
+      if (typeof ResizeObserver !== 'undefined') {
+        const observer = new ResizeObserver(syncScrollSpace);
+        [gridBody, chartScroll, U.$('#chartCanvas')].forEach(el => observer.observe(el));
+      }
+      syncScrollSpace();
       gridBody.addEventListener('wheel', (e) => {
-        // vertical wheel scrolls the whole chart; horizontal (shift) scrolls columns
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // let native horizontal scroll happen
-        chartScroll.scrollTop += e.deltaY; e.preventDefault();
+        if (e.ctrlKey || e.metaKey) return;
+        const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? gridBody.clientHeight : 1;
+        if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          gridBody.scrollLeft += (e.deltaX || e.deltaY) * unit;
+        } else {
+          // Editing a wrapped name may scroll its own text; otherwise the
+          // wheel over task names always moves the task list.
+          const editor = e.target.closest('textarea');
+          if (editor && document.activeElement === editor &&
+              (e.deltaY < 0 ? editor.scrollTop > 0 : editor.scrollTop + editor.clientHeight < editor.scrollHeight - 1)) return;
+          chartScroll.scrollTop += e.deltaY * unit;
+          gridBody.scrollTop = chartScroll.scrollTop;
+        }
+        e.preventDefault();
       }, { passive: false });
 
       /* Wheel over the chart itself.
@@ -901,11 +930,13 @@
         ? chartScroll.scrollTop <= 0
         : chartScroll.scrollTop >= chartScroll.scrollHeight - chartScroll.clientHeight - 1;
       chartScroll.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         const horizontalGesture = Math.abs(e.deltaX) > Math.abs(e.deltaY);
         if (horizontalGesture) return;                       // native handles deltaX
         if (e.shiftKey || atVEdge(e.deltaY)) {
           const before = chartScroll.scrollLeft;
-          chartScroll.scrollLeft += e.deltaY;
+          const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? chartScroll.clientWidth : 1;
+          chartScroll.scrollLeft += e.deltaY * unit;
           // Only claim the event if we actually moved the timeline, 
           // otherwise let the page do its normal thing at the extremes.
           if (chartScroll.scrollLeft !== before) e.preventDefault();
