@@ -590,10 +590,10 @@
        not an error: mail clients and chat apps truncate it, and the
        recipient opens a link that quietly does nothing. */
 
-    /** Keep copied links below Outlook's legacy 2,084-character boundary.
-        Safe Links can make the final URL longer, so leave room for its
-        wrapper and direct larger plans to the lossless project file. */
-    SHARE_LIMIT: 1900,
+    /** Roughly the longest URL that survives being pasted around.
+        Browsers and current Outlook releases cope with this size; beyond
+        it, mail security wrappers and older clients may truncate the URL. */
+    SHARE_LIMIT: 8000,
 
     _sharePayload() {
       const st = Object.assign({}, this.project.settings);

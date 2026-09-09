@@ -439,8 +439,8 @@
       if (r.tooLong) {
         App.openModal(App.T('ex.tooBigTitle', 'This plan is too big for a link'), (body) => {
           body.appendChild(U.el('p', {},
-            `The link would be ${r.length.toLocaleString()} characters. Outlook Safe Links, other mail clients, `
-            + `chat apps and some proxies can truncate long URLs, so the recipient may open an empty editor.`));
+            `The link would be ${r.length.toLocaleString()} characters. Mail clients, chat apps and `
+            + `some proxies truncate long URLs, so the person you send it to would open an empty editor.`));
           body.appendChild(U.el('p', { class: 'muted' },
             'Send them the project file instead, it opens with the Open button and has no size limit.'));
           const row = U.el('div', { class: 'modal-actions' });
@@ -458,13 +458,28 @@
       }
 
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(r.url).then(
+        this._copyShareLink(r.url).then(
           () => App.toast(App.T('ex.linkCopied', 'Shareable link copied, anyone with it can open this plan')),
           () => this._showLink(r.url)
         );
       } else {
         this._showLink(r.url);
       }
+    },
+    async _copyShareLink(url) {
+      /* Outlook's automatic URL detection can stop before a long fragment.
+         Supplying HTML and plain-text clipboard formats makes Outlook paste a
+         compact named hyperlink while address bars still receive the raw URL. */
+      if (window.ClipboardItem && navigator.clipboard.write) {
+        const safeUrl = String(url).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+        const html = `<a href="${safeUrl}">Open Gantt project</a>`;
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/plain': new Blob([url], { type: 'text/plain' }),
+          'text/html': new Blob([html], { type: 'text/html' }),
+        })]);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
     },
     _showLink(url) {
       App.openModal(App.T('ex.linkTitle', 'Shareable link'), (body) => {
