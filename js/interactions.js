@@ -170,17 +170,48 @@
     },
 
     wireRowDrag(row, id) {
-      row.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', id);
-        e.dataTransfer.effectAllowed = 'move';
-        row._dragId = id;
-      });
-      row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('dragover'); });
-      row.addEventListener('dragleave', () => row.classList.remove('dragover'));
-      row.addEventListener('drop', (e) => {
-        e.preventDefault(); row.classList.remove('dragover');
-        const dragId = e.dataTransfer.getData('text/plain');
-        if (dragId && dragId !== id) Model.reorderBefore(dragId, id);
+      const handle = row.querySelector('.row-drag-handle');
+      if (!handle) return;
+      handle.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0 || e.isPrimary === false) return;
+        e.preventDefault();
+        const started = performance.now();
+        let target = null, after = false, moves = 0;
+        const clearDrop = () => document.querySelectorAll('.grow-row.dragbefore, .grow-row.dragafter')
+          .forEach(el => el.classList.remove('dragbefore', 'dragafter'));
+        const move = (ev) => {
+          if (ev.pointerId !== e.pointerId) return;
+          moves++;
+          const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+          const next = hit && hit.closest ? hit.closest('.grow-row') : null;
+          clearDrop();
+          target = next && next.getAttribute('data-id') !== id ? next : null;
+          if (!target) return;
+          const rect = target.getBoundingClientRect();
+          after = ev.clientY >= rect.top + rect.height / 2;
+          target.classList.add(after ? 'dragafter' : 'dragbefore');
+        };
+        const finish = (ev) => {
+          if (ev.pointerId !== e.pointerId) return;
+          handle.removeEventListener('pointermove', move);
+          handle.removeEventListener('pointerup', finish);
+          handle.removeEventListener('pointercancel', finish);
+          try { handle.releasePointerCapture(e.pointerId); } catch (err) {}
+          clearDrop();
+          const targetId = target && target.getAttribute('data-id');
+          if (ev.type !== 'pointercancel' && targetId) Model.reorderRelative(id, targetId, after);
+          if (window.GanttDiagnostics) GanttDiagnostics.record('row-drag-end', {
+            event: ev.type, moved: !!targetId, after, moveEvents: moves,
+            durationMs: Math.round((performance.now() - started) * 10) / 10,
+          });
+        };
+        try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+        handle.addEventListener('pointermove', move);
+        handle.addEventListener('pointerup', finish);
+        handle.addEventListener('pointercancel', finish);
+        if (window.GanttDiagnostics) GanttDiagnostics.record('row-drag-start', {
+          pointerType: e.pointerType || 'mouse', tasks: Model.tasks().length,
+        });
       });
     },
   };

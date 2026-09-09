@@ -293,7 +293,7 @@
       if (t.id === Model.selectedId) cls.push('selected');
       if (t.type === 'group') cls.push('is-group');
       if (t.type === 'milestone') cls.push('is-milestone');
-      const row = U.el('div', { class: cls.join(' '), 'data-id': t.id, draggable: 'true' });
+      const row = U.el('div', { class: cls.join(' '), 'data-id': t.id });
       this.visibleColumns().forEach(c => {
         const cell = c.cell(t, i);
         this.sizeCell(cell, c);
@@ -309,6 +309,10 @@
     _nameCell(t) {
       const depth = Model.depth(t);
       const hasKids = Model.isParent(t.id);
+      const dragHandle = U.el('span', {
+        class: 'row-drag-handle', html: '⋮⋮',
+        title: 'Drag up or down to reorder', 'aria-hidden': 'true',
+      });
       const twisty = U.el('span', {
         class: 'twisty' + (hasKids ? '' : ' leaf'),
         html: hasKids ? (t.collapsed ? '▶' : '▼') : '•',
@@ -327,7 +331,7 @@
         onkeydown: (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); e.target.blur(); } },
       });
       input.value = t.name || '';
-      return U.el('div', { class: 'grow-cell col-name' }, [twisty, dot, input]);
+      return U.el('div', { class: 'grow-cell col-name' }, [dragHandle, twisty, dot, input]);
     },
     /* Every grid input needs an accessible name, and the name has to say
        WHICH ROW it belongs to.

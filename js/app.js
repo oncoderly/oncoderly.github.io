@@ -167,6 +167,7 @@
       this.refreshChartSummary();
       this.refreshColorLegend();
       this.syncSampleNote();
+      if (this.syncScrollSpace) this.syncScrollSpace();
     },
 
     // Swatch legend for the current "colour by" mode; empty (hidden) when off.
@@ -964,10 +965,8 @@
         gridBody.style.paddingBottom = Math.max(0,
           gridBody.clientHeight - chartScroll.clientHeight + canvas.scrollHeight - canvas.clientHeight) + 'px';
       };
-      if (typeof ResizeObserver !== 'undefined') {
-        const observer = new ResizeObserver(syncScrollSpace);
-        [gridBody, chartScroll, U.$('#chartCanvas')].forEach(el => observer.observe(el));
-      }
+      this.syncScrollSpace = syncScrollSpace;
+      window.addEventListener('resize', () => requestAnimationFrame(syncScrollSpace));
       syncScrollSpace();
       gridBody.addEventListener('wheel', (e) => {
         if (e.ctrlKey || e.metaKey) return;

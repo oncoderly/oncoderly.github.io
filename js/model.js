@@ -444,6 +444,10 @@
     },
 
     reorderBefore(dragId, targetId) {
+      this.reorderRelative(dragId, targetId, false);
+    },
+
+    reorderRelative(dragId, targetId, after) {
       if (dragId === targetId) return;
       const dragIdx = this.index(dragId);
       if (dragIdx < 0) return;
@@ -458,6 +462,7 @@
       drag.parentId = target ? target.parentId : null;
       let ti = this.index(targetId);
       if (ti < 0) ti = this.project.tasks.length;
+      else if (after) ti = this._subtreeEnd(targetId);
       this.project.tasks.splice(ti, 0, ...block);
       this._recalcGroups();
       this._afterChange();
