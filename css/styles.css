@@ -291,8 +291,11 @@ body.col-resizing .grow-row:hover { background: none; }
 .bar-label {
   position: absolute; left: 4px; white-space: nowrap; font-size: 11.5px;
   line-height: 16px; color: var(--ink); background: transparent;
-  padding: 0 3px; border-radius: 3px; pointer-events: none;
+  font-weight: 600; pointer-events: none;
 }
+.bar-label-in { display: block; clip-path: inset(0 calc(100% - var(--label-inside)) 0 0); }
+.bar-label-out { position: absolute; inset: 0; color: var(--ink); clip-path: inset(0 0 0 var(--label-inside)); }
+.bar.milestone .bar-label { color: var(--ink); }
 .bar.group .bar-label { font-size: 14px; font-weight: 700; }
 .bar-handle { position: absolute; top: 0; bottom: 0; width: 8px; cursor: ew-resize; }
 .bar-handle.l { left: -2px; } .bar-handle.r { right: -2px; }

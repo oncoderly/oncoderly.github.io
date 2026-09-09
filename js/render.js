@@ -823,9 +823,14 @@
         if (Model.project.settings.showProgress && t.progress > 0) {
           b.appendChild(U.el('div', { class: 'bar-fill', style: { width: (t.progress) + '%' } }));
         }
-        // Anchor names at the task start.
-        const lbl = U.el('div', { class: 'bar-label' },
-          t.name + (t.assignee ? '  ·  ' + t.assignee : ''));
+        // Draw the same label in two clipped layers: high-contrast text over
+        // the bar, and the normal page text colour after the bar ends.
+        const labelText = t.name + (t.assignee ? '  ·  ' + t.assignee : '');
+        const lbl = U.el('div', { class: 'bar-label' }, [
+          U.el('span', { class: 'bar-label-in', style: { color: U.contrast(this._barColor(t)) } }, labelText),
+          U.el('span', { class: 'bar-label-out' }, labelText),
+        ]);
+        lbl.style.setProperty('--label-inside', Math.max(0, w - 4) + 'px');
         b.appendChild(lbl);
 
         // handles
@@ -839,7 +844,12 @@
         b.appendChild(U.el('div', { class: 'bar-dep-dot r' }));
         b.appendChild(U.el('div', { class: 'bar-dep-dot l' }));
       } else {
-        b.appendChild(U.el('div', { class: 'bar-label' }, t.name));
+        const lbl = U.el('div', { class: 'bar-label' }, [
+          U.el('span', { class: 'bar-label-in', style: { color: '#fff' } }, t.name),
+          U.el('span', { class: 'bar-label-out' }, t.name),
+        ]);
+        lbl.style.setProperty('--label-inside', Math.max(0, w - 4) + 'px');
+        b.appendChild(lbl);
       }
 
       this.barA11y(b, t);
