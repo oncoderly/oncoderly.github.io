@@ -823,8 +823,8 @@
         if (Model.project.settings.showProgress && t.progress > 0) {
           b.appendChild(U.el('div', { class: 'bar-fill', style: { width: (t.progress) + '%' } }));
         }
-        // Keep the full name on the chart background. A fixed bar-width
-        // threshold cannot guarantee that a long, white label fits inside.
+        // Anchor names at the task start. The label background keeps long
+        // names readable both over the bar and beyond its finish.
         const lbl = U.el('div', { class: 'bar-label' },
           t.name + (t.assignee ? '  ·  ' + t.assignee : ''));
         b.appendChild(lbl);
@@ -840,7 +840,7 @@
         b.appendChild(U.el('div', { class: 'bar-dep-dot r' }));
         b.appendChild(U.el('div', { class: 'bar-dep-dot l' }));
       } else {
-        b.appendChild(U.el('div', { class: 'bar-label', style: { left: (w + 8) + 'px' } }, t.name));
+        b.appendChild(U.el('div', { class: 'bar-label' }, t.name));
       }
 
       this.barA11y(b, t);
