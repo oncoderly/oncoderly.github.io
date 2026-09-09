@@ -823,10 +823,10 @@
         if (Model.project.settings.showProgress && t.progress > 0) {
           b.appendChild(U.el('div', { class: 'bar-fill', style: { width: (t.progress) + '%' } }));
         }
-        // label, inside if wide enough
-        const inside = w > 60;
-        const lbl = U.el('div', { class: 'bar-label' + (inside ? ' inside' : ''),
-          style: inside ? { color: U.contrast(this._barColor(t)) } : {} }, t.name + (t.assignee ? '  ·  ' + t.assignee : ''));
+        // Keep the full name on the chart background. A fixed bar-width
+        // threshold cannot guarantee that a long, white label fits inside.
+        const lbl = U.el('div', { class: 'bar-label' },
+          t.name + (t.assignee ? '  ·  ' + t.assignee : ''));
         b.appendChild(lbl);
 
         // handles
