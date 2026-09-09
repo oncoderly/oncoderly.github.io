@@ -1,11 +1,11 @@
 /* sw.js - service worker for gantts.app (offline app shell) */
-var CACHE = 'gantts-v51';
-var V = '?v=65';
+var CACHE = 'gantts-v52';
+var V = '?v=66';
 var SHELL = [
   '/app.html',
   '/css/styles.css' + V,
   '/js/consent.js?v=30',
-  '/js/template-catalog.js?v=65',
+  '/js/template-catalog.js?v=66',
   '/js/i18n.js' + V,
   '/js/util.js' + V,
   '/js/store.js' + V,
@@ -21,6 +21,7 @@ var SHELL = [
   '/js/templates.js' + V,
   '/js/features.js' + V,
   '/js/app.js' + V,
+  '/assets/fonts/inter-full.woff2',
   '/assets/logo-mark.svg',
   '/assets/logo.svg',
   '/assets/logo-white.svg'
